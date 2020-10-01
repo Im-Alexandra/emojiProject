@@ -59,15 +59,30 @@
 
   .output {
     background-color: aquamarine;
-    width: 80%;
+    width: 300px;
     height: 300px;
     position: relative;
     border: solid 10px aquamarine;
   }
 
   .output p {
-      position: absolute;
+      display: inline-block;
+      margin:0;
       font-size: 14pt;
       font-family: Arial, Helvetica, sans-serif;
       font-weight: bold;
+      margin-right: 5px;
+      opacity: 1;
+      animation: falling 3s linear forwards;
+  }
+
+  @keyframes falling {
+    from {
+      opacity: 0;
+      transform: translateY(-150px);
+    }
+    to {
+      opacity: 1;
+      transform : translateY(0);
+  }
   }

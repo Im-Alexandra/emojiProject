@@ -27,24 +27,31 @@ function setup() {
     noCanvas();
     let lang = navigator.language || 'en-US';
     let speechRec = new p5.SpeechRec(lang, gotSpeech);
-    let continuous = true;
+    let continous = true;
     let interim = false;
+    let output = document.querySelector('.output');
     
-    speechRec.start(continuous, interim);
+    speechRec.start(continous, interim);
 
     function gotSpeech() {
         
+        console.log(speechRec);
         if ( speechRec.resultValue) {
-            createP(speechRec.resultString);
+            words = speechRec.resultString.split(" ");
+            
+            words.forEach((word, index) => {
+                setTimeout(function(){
+                    createP(word).parent(output);
+                    console.log(word);
+                    console.log(getTextWidth(word, "bold 14pt arial"));
+
+                }, 500*(index+1));
+            });
         }
-        words = speechRec.resultString.split(" ");
+        
 
         
-        words.forEach((word, index) => {
-            console.log(word);
-            console.log(getTextWidth(word, "bold 14pt arial"));
-            //animate the word falling - calculate
-        });
+        
         console.log(words);
 
     }
@@ -65,8 +72,6 @@ function getTextWidth(text, font) {
     //always round up so they are not on top of each other
     return Math.ceil(metrics.width + 5);
 };
-
-//console.log(getTextWidth("hello there!", "bold 12pt arial"));  // close to 86
 
 
 function positionText() {
