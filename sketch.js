@@ -1,38 +1,25 @@
-// let button = document.querySelector(".color");
-// let text = document.querySelector("h5");
-
-// var c1 = "#65d2a9";
-// button.style.background = c1;
-
-// button.addEventListener("click", () => {
-//   text.classList.add("disappear");
-//   button.classList.add("grow");
-// });
-
-
-// button.addEventListener("animationend", () => {
-//   if(button.classList.contains("grow")) {
-//     document.body.style.background = button.style.background;
-//     button.classList.remove("grow");
-//     button.style.background = "hsl(" + 360 * Math.random() + ',' +
-//     (25 + 70 * Math.random()) + '%,' + 
-//     (85 + 10 * Math.random()) + '%)';
-//   }
-// });
-
-// text.addEventListener("animationend", () => {text.remove();});
 var words = [];
 function setup() {
-	// createCanvas(windowWidth, windowHeight);
     noCanvas();
     let lang = navigator.language || 'en-US';
     let speechRec = new p5.SpeechRec(lang, gotSpeech);
     let continous = true;
     let interim = false;
     let output = document.querySelector('.output');
-    
-    speechRec.start(continous, interim);
+    let startBtn = document.querySelector('#start');
+    let stopBtn = document.querySelector('#stop');
 
+    startBtn.addEventListener('click', startListening);
+    stopBtn.addEventListener('click', stopListening);
+
+    function startListening() {
+        speechRec.start(continous, interim);
+    }
+
+    function stopListening() {
+        speechRec.stop();
+    }
+    
     function gotSpeech() {
         
         console.log(speechRec);
@@ -41,19 +28,26 @@ function setup() {
             
             words.forEach((word, index) => {
                 setTimeout(function(){
-                    createP(word).parent(output);
-                    console.log(word);
-                    console.log(getTextWidth(word, "bold 14pt arial"));
-
+                    var node = EmojiTranslate.translateForDisplay(words[index]);
+                    if (node.nodeName == 'SELECT') {
+                        console.log('This is a select node');
+                        var optionsArray = node.childNodes;
+                        var randomNumber = Math.floor(Math.random() * ((optionsArray.length-1) - 0) + 0);
+                        console.log('These are the options in it:');
+                        console.log(optionsArray);
+                        console.log(randomNumber);
+                        var pickedNodeValue = optionsArray[randomNumber];
+                        console.log(pickedNodeValue);
+                        createP(pickedNodeValue.innerText).parent(output);
+                        //output.appendChild(optionsArray[randomNumber]);
+                    } else if (node) {
+                        output.appendChild(node);
+                    }
+                    console.log(node);
                 }, 500*(index+1));
             });
         }
-        
-
-        
-        
         console.log(words);
-
     }
 }
 
@@ -77,3 +71,8 @@ function getTextWidth(text, font) {
 function positionText() {
     //will calculate the end position of text
 }
+
+function isElement(element) {
+    // works on major browsers back to IE7
+    return element instanceof Element || element instanceof HTMLDocument;  
+  }
