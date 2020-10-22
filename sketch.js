@@ -3,6 +3,7 @@ var allWords = [];
 let sentiment;
 let sentimentResult;
 let newModel;
+var negativePercent = document.querySelector('.negativePercent');
 function setup() {
     noCanvas();
     let lang = navigator.language || 'en-US';
@@ -19,11 +20,11 @@ function setup() {
 
     newModel = ml5.neuralNetwork();
     sentiment = ml5.sentiment('movieReviews', modelReady);
-    sentimentResult = createP('sentiment score:').parent(score);
+    sentimentResult = createP('sentiment score:').parent(output);
+    sentimentResult.addClass('sentimentScore');
 
     function startListening() {
         speechRec.start(continous, interim);
-        //console.log('ml5 version:', ml5.version);
     }
 
     function stopListening() {
@@ -76,14 +77,15 @@ function draw() {
 
 function analyseSentiment(text){
     console.log('Do sentiment analysis for: ' +text);
-    console.log(typeof text);
 
     // make the prediction
     var prediction = sentiment.predict(text.join(' '));
     console.log(prediction);
-
+    var percentage = Math.round(prediction.score * 100);
     // display sentiment result on html page
-    sentimentResult.html('Sentiment score: ' + prediction.score);
+    sentimentResult.html('Sentiment score: ' + prediction.score + ' ' + percentage + '%');
+    negativePercent.style.left = percentage+'%';
+    console.log(negativePercent.style.left);
 }
 
 function modelReady() {
