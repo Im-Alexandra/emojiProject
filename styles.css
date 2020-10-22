@@ -55,6 +55,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
   }
   .header {
     position: absolute;
@@ -66,6 +67,11 @@
     margin-left: 10px;
     margin-right: 10px;
     cursor: pointer;
+  }
+
+  #score {
+    text-align: left;
+    width: 320px;
   }
 
   .output {

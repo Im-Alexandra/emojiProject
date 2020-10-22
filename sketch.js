@@ -1,4 +1,8 @@
 var words = [];
+var allWords = [];
+let sentiment;
+let sentimentResult;
+let newModel;
 function setup() {
     noCanvas();
     let lang = navigator.language || 'en-US';
@@ -6,14 +10,20 @@ function setup() {
     let continous = true;
     let interim = false;
     let output = document.querySelector('.output');
+    let score = document.querySelector('#score');
     let startBtn = document.querySelector('#start');
     let stopBtn = document.querySelector('#stop');
 
     startBtn.addEventListener('click', startListening);
     stopBtn.addEventListener('click', stopListening);
 
+    newModel = ml5.neuralNetwork();
+    sentiment = ml5.sentiment('movieReviews', modelReady);
+    sentimentResult = createP('sentiment score:').parent(score);
+
     function startListening() {
         speechRec.start(continous, interim);
+        //console.log('ml5 version:', ml5.version);
     }
 
     function stopListening() {
@@ -21,33 +31,42 @@ function setup() {
     }
     
     function gotSpeech() {
-        
-        console.log(speechRec);
-        if ( speechRec.resultValue) {
+        console.log('**************************************');
+        console.log(speechRec.resultString);
+
+        if (speechRec.resultValue) {
             words = speechRec.resultString.split(" ");
-            
+        
+            console.log('Words: ' + words);
+            var counter = words.length;
             words.forEach((word, index) => {
                 setTimeout(function(){
                     var node = EmojiTranslate.translateForDisplay(words[index]);
                     if (node.nodeName == 'SELECT') {
-                        console.log('This is a select node');
                         var optionsArray = node.childNodes;
-                        var randomNumber = Math.floor(Math.random() * ((optionsArray.length-1) - 0) + 0);
-                        console.log('These are the options in it:');
-                        console.log(optionsArray);
-                        console.log(randomNumber);
+                        var randomNumber = Math.floor(Math.random() * ((optionsArray.length - 1) - 0) + 0);
+                        console.log('Word: ' + word + '\n' +
+                        'Number of options: ' + optionsArray.length + '\n' +
+                        'Random number picked: ' + randomNumber);
                         var pickedNodeValue = optionsArray[randomNumber];
-                        console.log(pickedNodeValue);
                         createP(pickedNodeValue.innerText).parent(output);
                         //output.appendChild(optionsArray[randomNumber]);
                     } else if (node) {
+                        console.log('Word: ' + word);
                         output.appendChild(node);
                     }
-                    console.log(node);
+                    
+                    counter -= 1;
+                    if (counter === 0){
+                        allWords.push(words);
+                        analyseSentiment(words);
+                    }
+                    
                 }, 500*(index+1));
             });
+            
         }
-        console.log(words);
+        
     }
 }
 
@@ -55,6 +74,22 @@ function draw() {
 
 }
 
+function analyseSentiment(text){
+    console.log('Do sentiment analysis for: ' +text);
+    console.log(typeof text);
+
+    // make the prediction
+    var prediction = sentiment.predict(text.join(' '));
+    console.log(prediction);
+
+    // display sentiment result on html page
+    sentimentResult.html('Sentiment score: ' + prediction.score);
+}
+
+function modelReady() {
+    // model is ready
+    console.log('MODEL LOADED');
+}
 
 function getTextWidth(text, font) {
     // if given, use cached canvas for better performance
