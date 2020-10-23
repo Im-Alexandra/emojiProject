@@ -71,21 +71,23 @@ function setup() {
     }
 }
 
-function draw() {
-
-}
-
 function analyseSentiment(text){
     console.log('Do sentiment analysis for: ' +text);
 
     // make the prediction
     var prediction = sentiment.predict(text.join(' '));
     console.log(prediction);
-    var percentage = Math.round(prediction.score * 100);
+    var positivePercentage = Math.round(prediction.score * 100);
     // display sentiment result on html page
-    sentimentResult.html('Sentiment score: ' + prediction.score + ' ' + percentage + '%');
-    negativePercent.style.left = percentage+'%';
+    sentimentResult.html('Sentiment score: ' + prediction.score + ' ' + positivePercentage + '%');
+    negativePercent.style.left = positivePercentage+'%';
     console.log(negativePercent.style.left);
+
+    var positive = jQuery('.positiveNumber');
+    var negative = jQuery('.negativeNumber');
+    var negativePercentage = 100 - positivePercentage;
+    animatePercentage(positivePercentage, positive);
+    animatePercentage(negativePercentage, negative);
 }
 
 function modelReady() {
@@ -93,20 +95,19 @@ function modelReady() {
     console.log('MODEL LOADED');
 }
 
-function getTextWidth(text, font) {
-    // if given, use cached canvas for better performance
-    // else, create new canvas
-    var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
-    var context = canvas.getContext("2d");
-    context.font = font;
-    var metrics = context.measureText(text);
-    //always round up so they are not on top of each other
-    return Math.ceil(metrics.width + 5);
-};
-
-
-function positionText() {
-    //will calculate the end position of text
+function animatePercentage(finalNumber, element) {
+    var $this = element;
+    jQuery({ Counter: $this.text()}).animate({ Counter: finalNumber }, {
+        duration: 4000,
+        easing: 'swing',
+        step: function () {
+        if (finalNumber > 50) {
+            $this.text(Math.ceil(this.Counter));
+        } else if (finalNumber <= 50) {
+            $this.text(Math.floor(this.Counter));
+        }
+        }
+    });
 }
 
 function isElement(element) {
