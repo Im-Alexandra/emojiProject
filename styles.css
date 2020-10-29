@@ -174,13 +174,17 @@
     bottom: 10px;
   }
 
+  .output .emojiSentimentScore {
+    position: absolute;
+    bottom: 30px;
+  }
+
   .output p {
     font-family: 'VT323', monospace !important;
     /* padding:10px 10% 5% 10%; */
     font-weight: 100 !important;
     font-size:14pt;
   }
-
 
   .output p, .output select, .output span {
       /* display: inline-block;

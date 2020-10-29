@@ -94,6 +94,7 @@
      * @returns {Array} The list of emoji translations or '' if none exist.
      */
     function getAllEmojiForWord(originalWord) {
+      console.log('BUNDLE CALLED');
       let word = originalWord.trim().toLowerCase();
     
       if (!word || word === '' || word === 'a' || word === 'it' || word === 'is')
@@ -130,6 +131,8 @@
       // If this is already an emoji, don't try to translate it.
       if (isMaybeAlreadyAnEmoji(word)) {
         useful.push(word);
+        console.log('//////////////SCORE1///////////////');
+        console.log(allEmoji[word].score);
         return useful;
       }
     
@@ -169,6 +172,7 @@
           }
         }
       }
+      console.log(useful);
       return (useful.length === 0) ? '' : useful;
     }
     
@@ -193,7 +197,7 @@
      */
     function translateForDisplay(word) {
       var node = document.createElement('span');
-    
+      console.log('CALLED');
       // Punctuation blows. Get all the punctuation at the start and end of the word.
       let firstSymbol = '';
       let lastSymbol = '';
@@ -209,9 +213,11 @@
     
       // If it's already an emoji, return it.
       var emoji = getAllEmojiForWord(word);
+      
       if (emoji === '')
         emoji = [word];
     
+      console.log(emoji);
       var node;
       if (emoji.length === 1) {
         node = document.createElement('span');
