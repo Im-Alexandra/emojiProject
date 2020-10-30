@@ -26,35 +26,31 @@
 
 		<h1>SENTIMENT ANALYSIS YEE YEE</h1>
 
-		<select name="cars" id="cars">
-			<option value="volvo">Emoji sentiment</option>
-			<option value="saab">Real sentiment</option>
-			<option value="mercedes">Mercedes</option>
-			<option value="audi">Audi</option>
+		<select name="cars" id="cars" onchange="toggle(this.value)">
+			<option value="intro" selected="selected">Intro</option>
+			<option value="text">Text</option>
+			<option value="bins">Bins</option>
 		</select>
 
-		<div class="output scrollbar" id="style-4">
+		<!-- INTRO -->
+		<div id="intro">
+			<h1>INTRO CONTAINER</h1>
+			<p>Clever words, knowledge, yes all that</p>
 		</div>
-		<div class="output emojiBins">
+
+		<!-- TEXT -->
+		<div class="output scrollbar" id="text">
+		</div>
+
+		<!-- BINS -->
+		<div class="output emojiBins" id="bins">
 			<div class="rightBin"><canvas id="poster"></canvas></div>
 			<div class="leftBin"><canvas id="poster"></canvas></div>
 			<div class=></div>
 		</div>
 
-		<!-- <div class="output scrollbar" id="style-4">
-			 <p>
-				Carried nothing on am warrant towards. Polite in of in oh needed itself silent course. Assistance travelling so especially do prosperous appearance mr no celebrated. Wanted easily in my called formed suffer. Songs hoped sense as taken ye mirth at. Believe fat how six drawing pursuit minutes far. Same do seen head am part it dear open to. Whatever may scarcely judgment had. 
-
-Able an hope of body. Any nay shyness article matters own removal nothing his forming. Gay own additions education satisfied the perpetual. If he cause manor happy. Without farther she exposed saw man led. Along on happy could cease green oh. 
-Admiration stimulated cultivated reasonable be projection possession of. Real no near room ye bred sake if some. Is arranging furnished knowledge agreeable so. Fanny as smile up small. It vulgar chatty simple months turned oh at change of. Astonished set expression solicitude way admiration. 
-
-Why end might ask civil again spoil. She dinner she our horses depend. Remember at children by reserved to vicinity. In affronting unreserved delightful simplicity ye. Law own advantage furniture continual sweetness bed agreeable perpetual. Oh song well four only head busy it. Afford son she had lively living. Tastes lovers myself too formal season our valley boy. Lived it their their walls might to by young. 
-
-Unpacked reserved sir offering bed judgment may and quitting speaking. Is do be improved raptures offering required in replying raillery. Stairs ladies friend by in mutual an no. Mr hence chief he cause. Whole no doors on hoped. Mile tell if help they ye full name. 	
-</p> 
-		</div> -->
-
-		<div class="barContainer">
+		<!-- RATING -->
+		<div class="barContainer" id="rating">
 			<p class="positiveNumber countAnimation">50</p>
 			<p class="negativeNumber countAnimation">50</p>
 			<div class="bar">
@@ -66,7 +62,8 @@ Unpacked reserved sir offering bed judgment may and quitting speaking. Is do be 
 		<!-- <div class="output"></div> -->
 		<div id="score"></div>
 
-		<div class="header">
+		<!-- CONTROLS -->
+		<div class="header" id="controls">
 			<div class="navAlign">
 				<div id="start"><img src="img/start.png"></div>
 				<div id="stop"><img src="img/pause.png"></div>
@@ -83,7 +80,7 @@ Unpacked reserved sir offering bed judgment may and quitting speaking. Is do be 
 	<script src="libraries/p5.dom.js"></script>
 	<script src="libraries/p5.sound.js"></script>
 	<script src="libraries/p5.speech.js"></script>
-	<script src="libraries/require.js" ></script>
+	<!-- <script src="libraries/require.js" ></script> -->
 	<!-- <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
 	<script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script> -->
 	<script src="sketch.js"></script>

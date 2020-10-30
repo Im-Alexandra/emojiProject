@@ -1,0 +1,22 @@
+[
+    {
+        "emoji": "100",
+        "char": "💯",
+        "score": 1
+    },
+    {
+        "emoji": "1234",
+        "char": "🔢",
+        "score": -1
+    },
+    {
+        "emoji": "grinning",
+        "char": "😀",
+        "score": 1
+    },
+    {
+        "emoji": "grimacing",
+        "char": "😬",
+        "score": -1
+    }
+]

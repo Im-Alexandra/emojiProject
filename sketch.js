@@ -1,3 +1,4 @@
+//START GLOBAL VARS
 var words = [];
 var allWords = [];
 let sentiment;
@@ -5,16 +6,24 @@ let sentimentResult;
 let emojiSentimentResult;
 let newModel;
 var score = 0;
-var negativePercent = document.querySelector('.negativePercent');
 var currentPickedChar = [];
 var allPickedChar = [];
+
+// ALL DOM ELEMENTS - CONTAINERS
+var introContainer = document.querySelector('#intro');
+var textContainer = document.querySelector('#text');
+var binsContainer = document.querySelector('#bins');
+var ratingContainer = document.querySelector('#rating');
+var controlsContainer = document.querySelector('#controls');
+// ALL DOM ELEMENTS - OTHER
+var negativePercent = document.querySelector('.negativePercent');
+
 function setup() {
     noCanvas();
     let lang = navigator.language || 'en-US';
     let speechRec = new p5.SpeechRec(lang, gotSpeech);
     let continous = true;
     let interim = false;
-    let output = document.querySelector('.output');
     let score = document.querySelector('#score');
     let startBtn = document.querySelector('#start');
     let stopBtn = document.querySelector('#stop');
@@ -26,8 +35,8 @@ function setup() {
 
     newModel = ml5.neuralNetwork();
     sentiment = ml5.sentiment('movieReviews', modelReady);
-    sentimentResult = createP('sentiment score:').parent(output);
-    emojiSentimentResult = createP('emoji sentiment score:').parent(output);
+    sentimentResult = createP('sentiment score:').parent(textContainer);
+    emojiSentimentResult = createP('emoji sentiment score:').parent(textContainer);
     sentimentResult.addClass('sentimentScore');
     emojiSentimentResult.addClass('emojiSentimentScore');
 
@@ -57,15 +66,15 @@ function setup() {
                         // 'Number of options: ' + optionsArray.length + '\n' +
                         // 'Random number picked: ' + randomNumber);
                         var pickedNodeValue = optionsArray[randomNumber];
-                        createP(pickedNodeValue.innerText).parent(output);
-                        //output.appendChild(optionsArray[randomNumber]);
+                        createP(pickedNodeValue.innerText).parent(textContainer);
+                        //textContainer.appendChild(optionsArray[randomNumber]);
                         currentPickedChar.push(pickedNodeValue.innerText);
                     } else if (node.nodeName == 'SPAN') {
                         var getEmoji =  EmojiTranslate.getAllEmojiForWord(word);
                         if (getEmoji !== '') {
                             currentPickedChar.push(node.innerText);
                         }
-                        output.appendChild(node);
+                        textContainer.appendChild(node);
                     }
 
                     // ONLY ONCE
@@ -146,29 +155,40 @@ function analyseEmojiSentiment(char) {
     }
 }
 
+//*****************************************************************
+//used to get the list of emojis to be scored
 function remakeList() {
     var list = loadJSON('libraries/emojiWithScore.json', testListLoaded);
-    var keywords;
+    var emojiToBeRatedList = [];
 
     function testListLoaded() {
         console.log('Loaded list: ', list);
         console.log(list.coffee.keywords);
 
         for (let i in list) {
-
-            if (list[i].keywords.includes("espresso") ) {
-                console.log(list[i].score);
-                console.log(list.emoji.score);
-            }
+            emojiToBeRatedList.push(list[i].char);
+            //console.log(i);
         }
-        
+
+        console.log(emojiToBeRatedList);
+        //console.log(emojiToBeRatedList);
+        createP(emojiToBeRatedList).parent(textContainer);
     }
 
 }
 
+//*****************************************************************
+//used to get the score from JSON to the JSON we are actually using
+function scoreTheList() {
+
+}
+
+//*****************************************************************
+//Callback for loading the data model for ml5 library 
+//TODO: disable play button until the model is ready
 function modelReady() {
     // model is ready
-    console.log('MODEL LOADED');
+    console.log('ML5 MODEL LOADED');
 }
 
 function animatePercentage(finalNumber, element) {
@@ -186,7 +206,36 @@ function animatePercentage(finalNumber, element) {
     });
 }
 
+//*****************************************************************
+//called when <select> is changed, to toggle visibility of elements 
+function toggle(value) {
+    console.log(value);
+    switch (value) {
+        case 'intro':
+            introContainer.classList.add('active');
+            introContainer.classList.remove('hide');
+            textContainer.classList.remove('active');
+            ratingContainer.classList.remove('active');
+            binsContainer.classList.remove('active');
+            break;
+        case 'text':
+            introContainer.classList.remove('active');
+            introContainer.classList.add('hide');
+            textContainer.classList.add('active');
+            ratingContainer.classList.add('active');
+            binsContainer.classList.remove('active');
+            break;
+        case 'bins':
+            introContainer.classList.remove('active');
+            introContainer.classList.add('hide');
+            textContainer.classList.remove('active');
+            ratingContainer.classList.add('active');
+            binsContainer.classList.add('active');
+            break;
+    }
+}
+
 function isElement(element) {
     // works on major browsers back to IE7
     return element instanceof Element || element instanceof HTMLDocument;  
-  }
+}
