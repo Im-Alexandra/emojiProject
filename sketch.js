@@ -32,7 +32,7 @@ function setup() {
 
     startBtn.addEventListener('click', startListening);
     stopBtn.addEventListener('click', stopListening);
-    restartBtn.addEventListener('click', remakeList);
+    restartBtn.addEventListener('click', scoreTheList);
 
     newModel = ml5.neuralNetwork();
     sentiment = ml5.sentiment('movieReviews', modelReady);
@@ -197,14 +197,50 @@ function remakeList() {
 }
 
 //*****************************************************************
-//used to get the score from JSON to the JSON we are actually using
+//used to get the score from our excel sheet JSON to the JSON we are actually using
 function scoreTheList() {
+    console.log('SCORE THE LIST');
+    var toBeScoredList = loadJSON('libraries/test/toBeScoredTest.json', toBeScoredListLoaded); //change to emojiWithScore
+    var scoreList;
 
-}
+    function toBeScoredListLoaded() {
+        scoreList = loadJSON('libraries/test/score.json', scoreListLoaded);
+    }
+
+    function scoreListLoaded() {
+        console.log('Both lists are loaded');
+        console.log(toBeScoredList);
+        console.log(scoreList);
+
+        var scoreListArray = Object.keys(scoreList).map(key => {
+            return scoreList[key];
+        });
+        var toBeScoredListArray = Object.entries(toBeScoredList).map((e) => ( { [e[0]]: e[1] } ));
+        //loop through new score - for each find an equivalent in the emoji list and put the new score in
+        scoreListArray.forEach((scoreItem, index) => {
+            // console.log(scoreItem.emoji.toString());
+            // console.log(scoreItem.score.toString());
+            var emojiScore = scoreItem.emoji;
+            var newScore = scoreItem.score.toString();
+
+            toBeScoredListArray.forEach((emoji, index) => {
+                for (var i in emoji) {
+                    if (i == emojiScore) {
+                        // console.log(i);
+                        emoji.score = newScore;
+                        // console.log(emoji);
+                    }
+                };
+            });
+        });
+
+        //NEW LIST
+        console.log(toBeScoredListArray);
+    };
+};
 
 //*****************************************************************
 //Callback for loading the data model for ml5 library 
-//TODO: disable play button until the model is ready
 function modelReady() {
     // model is ready
     console.log('ML5 MODEL LOADED');
