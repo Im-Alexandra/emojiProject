@@ -1,10 +1,10 @@
 //START GLOBAL VARS
-var words = [];
+var state = 'intro'; // text or bins or intro - according to toggle value
 var allWords = [];
-let sentiment;
-let sentimentResult;
-let emojiSentimentResult;
-let newModel;
+var sentiment;
+var sentimentResult;
+var emojiSentimentResult;
+var newModel;
 var score = 0;
 var currentPickedChar = [];
 var allPickedChar = [];
@@ -17,6 +17,11 @@ var ratingContainer = document.querySelector('#rating');
 var controlsContainer = document.querySelector('#controls');
 // ALL DOM ELEMENTS - OTHER
 var negativePercent = document.querySelector('.negativePercent');
+var startBtn = document.querySelector('#start');
+var stopBtn = document.querySelector('#stop');
+var restartBtn = document.querySelector('#restart');
+var positive = jQuery('.positiveNumber');
+var negative = jQuery('.negativeNumber');
 
 function setup() {
     noCanvas();
@@ -24,10 +29,6 @@ function setup() {
     let speechRec = new p5.SpeechRec(lang, gotSpeech);
     let continous = true;
     let interim = false;
-    let score = document.querySelector('#score');
-    let startBtn = document.querySelector('#start');
-    let stopBtn = document.querySelector('#stop');
-    let restartBtn = document.querySelector('#restart');
 
     startBtn.addEventListener('click', startListening);
     stopBtn.addEventListener('click', stopListening);
@@ -35,6 +36,7 @@ function setup() {
 
     newModel = ml5.neuralNetwork();
     sentiment = ml5.sentiment('movieReviews', modelReady);
+
     sentimentResult = createP('sentiment score:').parent(textContainer);
     emojiSentimentResult = createP('emoji sentiment score:').parent(textContainer);
     sentimentResult.addClass('sentimentScore');
@@ -49,55 +51,79 @@ function setup() {
     }
     
     function gotSpeech() {
-        console.log('NEW**************************************');
-
+        console.log('NEW SPEECH**************************************');
         if (speechRec.resultValue) {
-            words = speechRec.resultString.split(/\W/);
-        
-            console.log('Words: ' + words);
-            var counter = words.length;
-            words.forEach((word, index) => {
-                setTimeout(function(){
-                    var node = EmojiTranslate.translateForDisplay(words[index]);
-                    if (node.nodeName == 'SELECT') {
-                        var optionsArray = node.childNodes;
-                        var randomNumber = Math.floor(Math.random() * ((optionsArray.length - 1) - 0) + 0);
-                        // console.log('Word: ' + word + '\n' +
-                        // 'Number of options: ' + optionsArray.length + '\n' +
-                        // 'Random number picked: ' + randomNumber);
-                        var pickedNodeValue = optionsArray[randomNumber];
-                        createP(pickedNodeValue.innerText).parent(textContainer);
-                        //textContainer.appendChild(optionsArray[randomNumber]);
-                        currentPickedChar.push(pickedNodeValue.innerText);
-                    } else if (node.nodeName == 'SPAN') {
-                        var getEmoji =  EmojiTranslate.getAllEmojiForWord(word);
-                        if (getEmoji !== '') {
-                            currentPickedChar.push(node.innerText);
-                        }
-                        textContainer.appendChild(node);
-                    }
-
-                    // ONLY ONCE
-                    counter -= 1;
-                    if (counter === 0){
-                        allPickedChar.push(currentPickedChar);
-                        console.log('Current characters: ' + currentPickedChar);
-                        console.log('All characters: ' + allPickedChar);
-
-                        allWords.push(words);
-                        //analyseSentiment(words);
-                        for ( let i in currentPickedChar ) {
-                            analyseEmojiSentiment(currentPickedChar[i]);
-                        }     
-                        currentPickedChar = [];
-                    }
-                    
-                }, 500*(index+1));
-            });
+            var words = speechRec.resultString.split(/\W/);
             
+            switch (state) {
+                case 'intro':
+                    console.log('Intro mode - cant do anything with speech!');
+                    break;
+                case 'text':
+                    //display emoji and words in output call text sentiment
+                    displayEmojiInOutput(words);
+
+                    // PROBLEM - BELOW IS NOT UPDATED ON FIRST SPEECH
+                    allPickedChar = allPickedChar.concat(currentPickedChar);
+                        console.log('Current characters: ' + currentPickedChar);
+                        console.log('All characters ever said: ' + allPickedChar);
+                        console.log('All characters lenght: ' + allPickedChar.length);
+    
+                    allWords.push(words);
+                    analyseSentiment(words);
+
+                    for ( let i in currentPickedChar ) {
+                        analyseEmojiSentiment(currentPickedChar[i]);
+                    }     
+                    currentPickedChar = [];
+                    
+                    break;
+                case 'bins':
+                    //display emoji in bins call emoji sentiment
+                    //displayEmojiInOutput(words);
+
+                    break;
+            }
         }
-        
     }
+}
+
+//*****************************************************************
+//goes trhough all spoken words, finds corresponding emoji and parents it to the output
+//if there is no corresponding emoji it parents the text
+function displayEmojiInOutput(words) {
+    console.log('Words: ' + words);
+    var counter = words.length;
+
+    words.forEach((word, index) => {
+        setTimeout(function(){
+            var node = EmojiTranslate.translateForDisplay(words[index]);
+            if (node.nodeName == 'SELECT') {
+                var optionsArray = node.childNodes;
+                var randomNumber = Math.floor(Math.random() * ((optionsArray.length - 1) - 0) + 0);
+                // console.log('Word: ' + word + '\n' +
+                // 'Number of options: ' + optionsArray.length + '\n' +
+                // 'Random number picked: ' + randomNumber);
+                var pickedNodeValue = optionsArray[randomNumber];
+                createP(pickedNodeValue.innerText).parent(textContainer);
+                //textContainer.appendChild(optionsArray[randomNumber]);
+                currentPickedChar.push(pickedNodeValue.innerText.toString().trim());
+            } else if (node.nodeName == 'SPAN') {
+                var getEmoji =  EmojiTranslate.getAllEmojiForWord(word);
+                if (getEmoji !== '') {
+                    currentPickedChar.push(node.innerText.toString().trim());
+                }
+                textContainer.appendChild(node);
+            }
+            
+        }, 500*(index+1));
+    });
+}
+
+//*****************************************************************
+//goes through all spoken words and parents them to the output
+function displayWordsInOutput(words) {
+
 }
 
 function analyseSentiment(text){
@@ -114,8 +140,6 @@ function analyseSentiment(text){
     negativePercent.style.left = positivePercentage+'%';
     console.log(negativePercent.style.left);
 
-    var positive = jQuery('.positiveNumber');
-    var negative = jQuery('.negativeNumber');
     var negativePercentage = 100 - positivePercentage;
     animatePercentage(positivePercentage, positive);
     animatePercentage(negativePercentage, negative);
@@ -123,35 +147,30 @@ function analyseSentiment(text){
 
 function analyseEmojiSentiment(char) {
     var emoji = loadJSON('libraries/emojiWithScore.json', fileLoaded);
+    var positiveEmojiPercentage, negativeEmojiPercentage;
     
     function fileLoaded() {
         console.log('Json file loaded!');
         
         console.log('------- emoji sentiment ------');
         console.log(char.toString().trim());
-         //console.log(emoji);
-         //console.log(test);
-         //console.log(emoji.coffee);
-         //console.log(test['coffee']);
 
         for (let e in emoji) {
-            //WARNING: disgusting code
             if (emoji[e].char == char.toString().trim() ) {
                 console.log(emoji[e].score);
-                //console.log(emoji.emoji.score);
-                score = emoji[e].score;
+                score += Number(emoji[e].score);
             }
         }
- 
-        // for (var i = 0; i < text.length; i++) {
-        //     var word = text[i].toString();
-        //     if (emoji.hasOwnProperty(text[i])) {
-        //         console.log('Emoji matched: ' + word);
-        //         console.log('Score is: '+ parseInt(emoji[word]["score"]));
-        //         score += parseInt(emoji[word]["score"]);
-        //     }
-        // }
-        emojiSentimentResult.html('emoji sentiment score: ' + score + ' comparative: ' + score / allPickedChar.length );
+
+        positiveEmojiPercentage = Math.round((score / allPickedChar.length) * 100);
+        negativeEmojiPercentage = 100 - positiveEmojiPercentage;
+
+        animatePercentage(positiveEmojiPercentage, positive);
+        animatePercentage(negativeEmojiPercentage, negative);
+
+        console.log('Positive percentage: ' + positiveEmojiPercentage);
+        console.log('Negative percentage: ' + negativeEmojiPercentage);
+        emojiSentimentResult.html('emoji sentiment score: ' + score + ' comparative: ' + score / allPickedChar.length + ' ' + Math.round((score / allPickedChar.length) * 100) + '%');
     }
 }
 
@@ -189,6 +208,9 @@ function scoreTheList() {
 function modelReady() {
     // model is ready
     console.log('ML5 MODEL LOADED');
+    startBtn.disabled = false;
+    stopBtn.disabled = false;
+    restartBtn.disabled = false;
 }
 
 function animatePercentage(finalNumber, element) {
@@ -209,7 +231,8 @@ function animatePercentage(finalNumber, element) {
 //*****************************************************************
 //called when <select> is changed, to toggle visibility of elements 
 function toggle(value) {
-    console.log(value);
+    state = value;
+    console.log(state);
     switch (value) {
         case 'intro':
             introContainer.classList.add('active');

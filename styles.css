@@ -83,8 +83,17 @@ select, select:active, select:focus, select:hover {
 .header img {
   max-width:30px;
   cursor: pointer;
-  padding: 10% 10% 10% 10%;
-  border: 3px solid white;
+}
+
+.header button {
+  display: block;
+  padding: 5px;
+  background-color: transparent !important;
+  border: 3px solid white !important;
+}
+
+.header button:disabled {
+  border-color: #ffffff57!important;
 }
 
 #stop {

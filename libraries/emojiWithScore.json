@@ -3,7 +3,8 @@
       "keywords": ["face", "smile", "happy", "joy", ":D", "grin"],
       "char": "😀",
       "fitzpatrick_scale": false,
-      "category": "people"
+      "category": "people",
+      "score": "1"
     },
     "grimacing": {
       "keywords": ["face", "grimace", "teeth"],
@@ -75,7 +76,8 @@
       "keywords": ["face", "smile", "happy", "flushed", "crush", "embarrassed", "shy", "joy"],
       "char": "😊",
       "fitzpatrick_scale": false,
-      "category": "people"
+      "category": "people",
+      "score": "1"
     },
     "slightly_smiling_face": {
       "keywords": ["face", "smile"],
@@ -3645,61 +3647,71 @@
       "keywords": ["beverage", "drink", "cow"],
       "char": "🥛",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "-1"
     },
     "beer": {
       "keywords": ["relax", "beverage", "drink", "drunk", "party", "pub", "summer", "alcohol", "booze"],
       "char": "🍺",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "1"
     },
     "beers": {
       "keywords": ["relax", "beverage", "drink", "drunk", "party", "pub", "summer", "alcohol", "booze"],
       "char": "🍻",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "1"
     },
     "clinking_glasses": {
       "keywords": ["beverage", "drink", "party", "alcohol", "celebrate", "cheers", "wine", "champagne", "toast"],
       "char": "🥂",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "1"
     },
     "wine_glass": {
       "keywords": ["drink", "beverage", "drunk", "alcohol", "booze"],
       "char": "🍷",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "1"
     },
     "tumbler_glass": {
       "keywords": ["drink", "beverage", "drunk", "alcohol", "liquor", "booze", "bourbon", "scotch", "whisky", "glass", "shot"],
       "char": "🥃",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "-1"
     },
     "cocktail": {
       "keywords": ["drink", "drunk", "alcohol", "beverage", "booze", "mojito"],
       "char": "🍸",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "1"
     },
     "tropical_drink": {
       "keywords": ["beverage", "cocktail", "summer", "beach", "alcohol", "booze", "mojito"],
       "char": "🍹",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "1"
     },
     "champagne": {
       "keywords": ["drink", "wine", "bottle", "celebration"],
       "char": "🍾",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "1"
     },
     "sake": {
       "keywords": ["wine", "drink", "drunk", "beverage", "japanese", "alcohol", "booze"],
       "char": "🍶",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "1"
     },
     "tea": {
       "keywords": ["drink", "bowl", "breakfast", "green", "british"],
@@ -3712,7 +3724,8 @@
       "keywords": ["drink", "soda"],
       "char": "🥤",
       "fitzpatrick_scale": false,
-      "category": "food_and_drink"
+      "category": "food_and_drink",
+      "score": "-1"
     },
     "coffee": {
       "keywords": ["beverage", "caffeine", "latte", "espresso"],
@@ -6755,13 +6768,15 @@
       "keywords": ["drink", "faucet", "tap", "circle"],
       "char": "🚱",
       "fitzpatrick_scale": false,
-      "category": "symbols"
+      "category": "symbols",
+      "score": "-1"
     },
     "underage": {
       "keywords": ["18", "drink", "pub", "night", "minor", "circle"],
       "char": "🔞",
       "fitzpatrick_scale": false,
-      "category": "symbols"
+      "category": "symbols",
+      "score": "-1"
     },
     "no_mobile_phones": {
       "keywords": ["iphone", "mute", "circle"],
