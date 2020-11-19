@@ -310,6 +310,7 @@ function toggle(value) {
             startBtn.disabled = true;
             stopBtn.disabled = true;
             restartBtn.disabled = true;
+            controlsContainer.classList.remove('active');
             break;
         case 'test':
             introContainer.classList.remove('active');
@@ -318,6 +319,7 @@ function toggle(value) {
             textContainer.classList.remove('active');
             ratingContainer.classList.add('active');
             binsContainer.classList.remove('active');
+            controlsContainer.classList.add('active');
             if (modelReadyB) {
                 startBtn.disabled = false;
                 stopBtn.disabled = false;
@@ -331,6 +333,7 @@ function toggle(value) {
             textContainer.classList.remove('active');
             ratingContainer.classList.add('active');
             binsContainer.classList.add('active');
+            controlsContainer.classList.add('active');
             if (modelReadyB) {
                 startBtn.disabled = false;
                 stopBtn.disabled = false;
@@ -344,6 +347,7 @@ function toggle(value) {
             textContainer.classList.add('active');
             ratingContainer.classList.add('active');
             binsContainer.classList.remove('active');
+            controlsContainer.classList.add('active');
             if (modelReadyB) {
                 startBtn.disabled = false;
                 stopBtn.disabled = false;
