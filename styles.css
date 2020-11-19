@@ -96,6 +96,17 @@ select, select:active, select:focus, select:hover {
   border-color: #ffffff57!important;
 }
 
+.header button:active {
+  background-color: purple;
+}
+
+.header button:focus {
+  background-color:#1f6855 !important;
+  outline: 0 !important;
+}
+
+/* active visited focus hover */
+
 #stop {
   margin-right: 10px;
   margin-left: 10px;

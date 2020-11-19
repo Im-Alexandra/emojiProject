@@ -1,4 +1,4 @@
-let NUM_BALLS = 100,
+let NUM_BALLS = 50,
     DAMPING = 0.7,
     GRAVITY = 0.3,
     SPEED = 0.3;
@@ -17,7 +17,7 @@ window.requestAnimFrame =
 
 var id = 0
 
-let Ball = function(x, y, radius) {
+let Ball = function(x, y, radius, emoji) {
     this.id = id++;
     this.x = x;
     this.y = y;
@@ -26,6 +26,7 @@ let Ball = function(x, y, radius) {
     this.fx = 0;
     this.fy = 0;
     this.radius = radius;
+    this.emoji = emoji;
 };
 
 Ball.prototype.apply_force = function(delta) {
@@ -52,11 +53,15 @@ Ball.prototype.verlet = function() {
 Ball.prototype.draw = function(ctx,color) {
 
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, TWO_PI);
-    this.id === 1 ? ctx.fillStyle = '#e8112d': ctx.fillStyle = color;
-    // ctx.stroke();
+    // ctx.arc(this.x, this.y, this.radius, 0, TWO_PI);
+    ctx.arc(this.x, this.y, 30, 0, TWO_PI);
+    //this.id === 1 ? ctx.fillStyle = '#e8112d': ctx.fillStyle = color;
+    //ctx.stroke();
     // ctx.strokeStyle = "#e8112d";
-    ctx.fill();
+    //ctx.fill();
+    ctx.font = "60px Arial";
+    ctx.textAlign="center";
+    ctx.fillText("😂", this.x + 15, this.y + 15);
 };
 
 
