@@ -8,9 +8,11 @@ var newModel;
 var score = 0;
 var currentPickedChar = [];
 var allPickedChar = [];
+var modelReadyB = false;
 
 // ALL DOM ELEMENTS - CONTAINERS
 var introContainer = document.querySelector('#intro');
+var testContainer = document.querySelector('#test');
 var textContainer = document.querySelector('#text');
 var binsContainer = document.querySelector('#bins');
 var ratingContainer = document.querySelector('#rating');
@@ -37,8 +39,8 @@ function setup() {
     newModel = ml5.neuralNetwork();
     sentiment = ml5.sentiment('movieReviews', modelReady);
 
-    sentimentResult = createP('sentiment score:').parent(textContainer);
-    emojiSentimentResult = createP('emoji sentiment score:').parent(textContainer);
+    sentimentResult = createP('sentiment score:').parent(testContainer);
+    emojiSentimentResult = createP('emoji sentiment score:').parent(testContainer);
     sentimentResult.addClass('sentimentScore');
     emojiSentimentResult.addClass('emojiSentimentScore');
 
@@ -53,17 +55,18 @@ function setup() {
     function gotSpeech() {
         console.log('NEW SPEECH**************************************');
         if (speechRec.resultValue) {
-            var words = speechRec.resultString.split(/\W/);
+            var words = speechRec.resultString.split(" ");
             
             switch (state) {
                 case 'intro':
                     console.log('Intro mode - cant do anything with speech!');
                     break;
-                case 'text':
+
+                case 'test':
                     //display emoji and words in output call text sentiment
                     displayEmojiInOutput(words);
 
-                    // PROBLEM - BELOW IS NOT UPDATED ON FIRST SPEECH
+                    // TODO: PROBLEM - BELOW IS NOT UPDATED ON FIRST SPEECH
                     allPickedChar = allPickedChar.concat(currentPickedChar);
                         console.log('Current characters: ' + currentPickedChar);
                         console.log('All characters ever said: ' + allPickedChar);
@@ -76,13 +79,21 @@ function setup() {
                         analyseEmojiSentiment(currentPickedChar[i]);
                     }     
                     currentPickedChar = [];
-                    
                     break;
+
                 case 'bins':
                     //display emoji in bins call emoji sentiment
                     //displayEmojiInOutput(words);
 
                     break;
+
+                case 'text':
+                    //display words
+                    displayTextInOutput(words);
+                    allWords.push(words);
+
+                    //animate rating according to academic sentiment
+                    analyseSentiment(words);
             }
         }
     }
@@ -105,15 +116,16 @@ function displayEmojiInOutput(words) {
                 // 'Number of options: ' + optionsArray.length + '\n' +
                 // 'Random number picked: ' + randomNumber);
                 var pickedNodeValue = optionsArray[randomNumber];
-                createP(pickedNodeValue.innerText).parent(textContainer);
-                //textContainer.appendChild(optionsArray[randomNumber]);
+                createP(pickedNodeValue.innerText.toString().trim()).parent(testContainer);
+                //testContainer.appendChild(optionsArray[randomNumber]);
                 currentPickedChar.push(pickedNodeValue.innerText.toString().trim());
             } else if (node.nodeName == 'SPAN') {
                 var getEmoji =  EmojiTranslate.getAllEmojiForWord(word);
                 if (getEmoji !== '') {
+                    //its emoji
                     currentPickedChar.push(node.innerText.toString().trim());
                 }
-                textContainer.appendChild(node);
+                testContainer.appendChild(node);
             }
             
         }, 500*(index+1));
@@ -121,15 +133,32 @@ function displayEmojiInOutput(words) {
 }
 
 //*****************************************************************
-//goes through all spoken words and parents them to the output
-function displayWordsInOutput(words) {
+//goes trhough all spoken words and prints them in the output
+function displayTextInOutput(words) {
+    console.log('Spoken words: ' + words);
+    var counter = words.length;
 
-}
+    words.forEach((word, index) => {
+        setTimeout(function(){
+            if (counter == words.length) {
+                word = word.charAt(0).toUpperCase() + word.slice(1); ;
+            }
+
+            var addWord = createP(word).parent(textContainer);
+            counter --;
+
+            if (counter == 0) {
+                addWord.addClass('lastWord');
+                var dot = createP('.').parent(textContainer);
+            }
+        }, 500*(index+1));
+    });
+};
 
 function analyseSentiment(text){
-    console.log('Do sentiment analysis for: ' +text);
-    console.log('All words said: ' + allWords);
+    console.log('Do academic sentiment analysis for: ');
     console.log(text);
+    console.log('All words said: ' + allWords);
 
     // make the prediction
     var prediction = sentiment.predict(text.join(' '));
@@ -143,10 +172,10 @@ function analyseSentiment(text){
     var negativePercentage = 100 - positivePercentage;
     animatePercentage(positivePercentage, positive);
     animatePercentage(negativePercentage, negative);
-}
+};
 
 function analyseEmojiSentiment(char) {
-    var emoji = loadJSON('libraries/emojiWithScore.json', fileLoaded);
+    var emoji = loadJSON('libraries/emojiNewWithScore.json', fileLoaded);
     var positiveEmojiPercentage, negativeEmojiPercentage;
     
     function fileLoaded() {
@@ -191,7 +220,7 @@ function remakeList() {
 
         console.log(emojiToBeRatedList);
         //console.log(emojiToBeRatedList);
-        createP(emojiToBeRatedList).parent(textContainer);
+        createP(emojiToBeRatedList).parent(testContainer);
     }
 
 }
@@ -200,7 +229,7 @@ function remakeList() {
 //used to get the score from our excel sheet JSON to the JSON we are actually using
 function scoreTheList() {
     console.log('SCORE THE LIST');
-    var toBeScoredList = loadJSON('libraries/test/toBeScoredTest.json', toBeScoredListLoaded); //change to emojiWithScore
+    var toBeScoredList = loadJSON('libraries/emojiWithScore.json', toBeScoredListLoaded); //change to emojiWithScore
     var scoreList;
 
     function toBeScoredListLoaded() {
@@ -226,16 +255,14 @@ function scoreTheList() {
             toBeScoredListArray.forEach((emoji, index) => {
                 for (var i in emoji) {
                     if (i == emojiScore) {
-                        // console.log(i);
-                        emoji.score = newScore;
-                        // console.log(emoji);
+                        emoji[i].score = newScore;
                     }
                 };
             });
         });
 
         //NEW LIST
-        console.log(toBeScoredListArray);
+        console.log(JSON.stringify(toBeScoredListArray));
     };
 };
 
@@ -244,9 +271,12 @@ function scoreTheList() {
 function modelReady() {
     // model is ready
     console.log('ML5 MODEL LOADED');
-    startBtn.disabled = false;
-    stopBtn.disabled = false;
-    restartBtn.disabled = false;
+    modelReadyB = true;
+    if (state != 'intro') {
+        startBtn.disabled = false;
+        stopBtn.disabled = false;
+        restartBtn.disabled = false;
+    };
 }
 
 function animatePercentage(finalNumber, element) {
@@ -273,26 +303,55 @@ function toggle(value) {
         case 'intro':
             introContainer.classList.add('active');
             introContainer.classList.remove('hide');
+            testContainer.classList.remove('active');
             textContainer.classList.remove('active');
             ratingContainer.classList.remove('active');
             binsContainer.classList.remove('active');
+            startBtn.disabled = true;
+            stopBtn.disabled = true;
+            restartBtn.disabled = true;
             break;
-        case 'text':
+        case 'test':
             introContainer.classList.remove('active');
             introContainer.classList.add('hide');
-            textContainer.classList.add('active');
+            testContainer.classList.add('active');
+            textContainer.classList.remove('active');
             ratingContainer.classList.add('active');
             binsContainer.classList.remove('active');
+            if (modelReadyB) {
+                startBtn.disabled = false;
+                stopBtn.disabled = false;
+                restartBtn.disabled = false;
+            };
             break;
         case 'bins':
             introContainer.classList.remove('active');
             introContainer.classList.add('hide');
+            testContainer.classList.remove('active');
             textContainer.classList.remove('active');
             ratingContainer.classList.add('active');
             binsContainer.classList.add('active');
+            if (modelReadyB) {
+                startBtn.disabled = false;
+                stopBtn.disabled = false;
+                restartBtn.disabled = false;
+            };
+            break;
+        case 'text':
+            introContainer.classList.remove('active');
+            introContainer.classList.add('hide');
+            testContainer.classList.remove('active');
+            textContainer.classList.add('active');
+            ratingContainer.classList.add('active');
+            binsContainer.classList.remove('active');
+            if (modelReadyB) {
+                startBtn.disabled = false;
+                stopBtn.disabled = false;
+                restartBtn.disabled = false;
+            };
             break;
     }
-}
+};
 
 function isElement(element) {
     // works on major browsers back to IE7

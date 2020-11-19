@@ -28,8 +28,9 @@
 
 		<select name="cars" id="cars" onchange="toggle(this.value)">
 			<option value="intro" selected="selected">Intro</option>
-			<option value="text">Text</option>
+			<option value="test">Test</option>
 			<option value="bins">Bins</option>
+			<option value="text">Text</option>
 		</select>
 
 		<!-- INTRO -->
@@ -38,11 +39,15 @@
 			<p>Clever words, knowledge, yes all that</p>
 		</div>
 
-		<!-- TEXT -->
-		<div class="output scrollbar" id="text">
+		<!-- TEST - original test (emoji + text)-->
+		<div class="output scrollbar" id="test">
 		</div>
 
-		<!-- BINS -->
+		<!-- TEXT - only text with academic sentiment analysis -->
+		<div class="output scrollbar" id="text">
+		</div>
+		
+		<!-- BINS - only emoji with our subjective sentiment analysis -->
 		<div class="output emojiBins" id="bins">
 			<div class="rightBin"><canvas id="poster"></canvas></div>
 			<div class="leftBin"><canvas id="poster"></canvas></div>
