@@ -1,7 +1,8 @@
-let NUM_BALLS = 50,
+let NUM_BALLS = 10,
     DAMPING = 0.7,
     GRAVITY = 0.3,
     SPEED = 0.3;
+    LETTERS = ['A', 'L', 'E', 'X', 'A', 'N', 'D', 'R', 'A'];
 
 let canvas, ctx, TWO_PI = Math.PI * 2, balls = [], mouse = {down:false,x:0,y:0};
 
@@ -17,7 +18,7 @@ window.requestAnimFrame =
 
 var id = 0
 
-let Ball = function(x, y, radius, emoji) {
+let Ball = function(x, y, radius, content, score) {
     this.id = id++;
     this.x = x;
     this.y = y;
@@ -26,7 +27,8 @@ let Ball = function(x, y, radius, emoji) {
     this.fx = 0;
     this.fy = 0;
     this.radius = radius;
-    this.emoji = emoji;
+    this.content = content;
+    this.score = score;
 };
 
 Ball.prototype.apply_force = function(delta) {
@@ -54,16 +56,42 @@ Ball.prototype.draw = function(ctx,color) {
 
     ctx.beginPath();
     // ctx.arc(this.x, this.y, this.radius, 0, TWO_PI);
-    ctx.arc(this.x, this.y, 30, 0, TWO_PI);
+    ctx.arc(this.x, this.y, this.radius, 0, TWO_PI);
     //this.id === 1 ? ctx.fillStyle = '#e8112d': ctx.fillStyle = color;
     //ctx.stroke();
     // ctx.strokeStyle = "#e8112d";
     //ctx.fill();
-    ctx.font = "60px Arial";
+    ctx.font = "45px Arial";
     ctx.textAlign="center";
-    ctx.fillText("😂", this.x + 15, this.y + 15);
+    ctx.textBaseline = 'middle';
+    ctx.fillText(this.content, this.x, this.y);
 };
 
+// let LeftBin = function() {
+//     this.width = canvas.width / 2;
+//     this.height = canvas.height;
+//     this.x = 0;
+//     this.y = 0;
+// };
+
+// let RightBin = function() {
+//     this.width = canvas.width / 2;
+//     this.height = canvas.height;
+//     this.x = canvas.width / 2;
+//     this.y = 0;
+// };
+
+// LeftBin.prototype.draw = function(){
+//     stroke(255, 204, 100);
+//     strokeWeight(4);
+//     rect(this.x, this.y, this.width, this.height);
+// }
+
+// RightBin.prototype.draw = function(){
+//     stroke(255, 204, 0);
+//     strokeWeight(4);
+//     rect(this.x, this.y, this.width, this.height);
+// }
 
 var resolve_collisions = function(ip) {
 
@@ -132,33 +160,43 @@ var check_walls = function() {
 
     while (i--) {
         var ball = balls[i];
-        if (ball.x < ball.radius) {
+        if (ball.score == '1'){
+            if (ball.x < ball.radius) {
+                var vel_x = ball.px - ball.x;
+                ball.x = ball.radius;
+                ball.px = ball.x - vel_x * DAMPING;
+    
+            } else if (ball.x + ball.radius > 360) {
+                var vel_x = ball.px - ball.x;
+                ball.x = 360 - ball.radius;
+                ball.px = ball.x - vel_x * DAMPING;
+            }
+     
+            if (ball.y + ball.radius > canvas.height) {
+                var vel_y = ball.py - ball.y;
+                ball.y = canvas.height - ball.radius;
+                ball.py = ball.y - vel_y * DAMPING;
+            }
+        } else if (ball.score == '-1') {
+            if (ball.x < 460) {
+                var vel_x = ball.px - ball.x;
+                ball.x = 460;
+                ball.px = ball.x - vel_x * DAMPING;
+    
+            } else if (ball.x + ball.radius > canvas.width) {
+                var vel_x = ball.px - ball.x;
+                ball.x = canvas.width - ball.radius;
+                ball.px = ball.x - vel_x * DAMPING;
+            }
+     
+            if (ball.y + ball.radius > canvas.height) {
+                var vel_y = ball.py - ball.y;
+                ball.y = canvas.height - ball.radius;
+                ball.py = ball.y - vel_y * DAMPING;
+            }
 
-            var vel_x = ball.px - ball.x;
-            ball.x = ball.radius;
-            ball.px = ball.x - vel_x * DAMPING;
-
-        } else if (ball.x + ball.radius > canvas.width) {
-
-            var vel_x = ball.px - ball.x;
-            ball.x = canvas.width - ball.radius;
-            ball.px = ball.x - vel_x * DAMPING;
         }
- 
-// top Corner rules
-//         if (ball.y < ball.radius) {
-
-//             var vel_y = ball.py - ball.y;
-//             ball.y = ball.radius;
-//             ball.py = ball.y - vel_y * DAMPING;
-
-//         } 
-         if (ball.y + ball.radius > canvas.height) {
-
-            var vel_y = ball.py - ball.y;
-            ball.y = canvas.height - ball.radius;
-            ball.py = ball.y - vel_y * DAMPING;
-        }
+        
     }
 };
 
@@ -199,51 +237,54 @@ var update = function() {
 
 
 
-var add_ball = function(x, y, r) {
-   
-    var x = x || Math.random() * (canvas.width - 60) + 30,
-        y = y || Math.random() * (canvas.height - 60) - canvas.height,
-        r = r || 10 + Math.random() * 25,
-        s = true,
-        i = balls.length;
- 
-    while (i--) {
-        var ball = balls[i];
-        var diff_x = ball.x - x;
-        var diff_y = ball.y - y;
-        var dist = Math.sqrt(diff_x * diff_x + diff_y * diff_y);
-
-        if (dist < ball.radius + r) {
-            s = false;
-            break;
-        }
+var add_ball = function(x, y, r, content, score) {
+    console.log('add ball called: ' + this.content);
+    if (score == '1'){
+        var x = x || Math.random() * (355 - 30) + 30;
+    } else if (score == '-1') {
+        var x = x || Math.random() * (800 - 460) + 460;
     }
+    
+    //0-335, 460-800
+    y = y || Math.random() * (canvas.height - 60) - canvas.height,
+    // r = r || 10 + Math.random() * 25,
+    r = 20,
+    s = true,
+    i = balls.length;
 
-    if (s) balls.push(new Ball(x, y, r,));
+    if (s) balls.push(new Ball(x, y, r, content, score));
+    console.log(balls);
 };
 
-window.addEventListener('resize', resizeCanvas, false);
+// window.addEventListener('resize', resizeCanvas, false);
 
-function resizeCanvas() {
- canvas.width = window.innerWidth;
- canvas.height = window.innerHeight;
-}
+// function resizeCanvas() {
+//  canvas.width = window.innerWidth;
+//  canvas.height = window.innerHeight;
+//  console.log(canvas);
+
+// }
 
 
-window.onload = function() {
+function startBinAnimation(emojiArray) {
 
-    canvas = document.getElementById('poster');
+    canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
 
-    canvas.width = window.innerWidth;;
-    canvas.height = window.innerHeight;
+    canvas.width = 800;
+    canvas.height = 440;
+    console.log(emojiArray);
+
+    if (emojiArray != '') {
+        emojiArray.forEach((emoji, index) => {
+            setTimeout(function(){
+                // console.log(emoji);
+                add_ball(undefined, undefined, undefined, emoji.emoji, emoji.score);
+            }, 1000*(index+1));
+        });
+    };
     
-    while (NUM_BALLS--) add_ball();
-
-   
-
     canvas.oncontextmenu = function(e) {
-
         e.preventDefault();
         return false;
     };
@@ -251,35 +292,36 @@ window.onload = function() {
     update();
  
     function isIntersect(point, circle) {
-     return Math.sqrt((point.x-circle.x) ** 2 + (point.y - circle.y) ** 2) < circle.radius;
-   }
-   canvas.addEventListener('click', (e) => {
-     const pos = {
-       x: e.clientX,
-       y: e.clientY
-     };
-     balls.forEach(ball => {
-       if (isIntersect(pos, ball)) {
-         console.log('click on circle: ' + ball.id);
-         if (ball.id === 1) {
-          alert('RED BALL')
-         } else {
-showMessage()
-         }
-       }
-     });
-   });
+        return Math.sqrt((point.x-circle.x) ** 2 + (point.y - circle.y) ** 2) < circle.radius;
+    }
+
+    canvas.addEventListener('click', (e) => {
+        const pos = {
+            x: e.clientX,
+            y: e.clientY
+        };
+        balls.forEach(ball => {
+            if (isIntersect(pos, ball)) {
+                console.log('click on circle: ' + ball.id);
+                if (ball.id === 1) {
+                    alert('RED BALL')
+                } else {
+                    showMessage()
+                }
+        }
+        });
+    });
  
-  // Show Text Block
-  let currentStep = 0;
-  const messageArr = ['text 1', 'text 2', 'text 3', 'text 4', 'text 5'];
+    // Show Text Block
+    let currentStep = 0;
+    const messageArr = ['text 1', 'text 2', 'text 3', 'text 4', 'text 5'];
  
-  function showMessage() {
-     alert(messageArr[currentStep]);
-     currentStep++;
-     if (currentStep === messageArr.length) {
-       currentStep = 0;
-     }
-  }
+    function showMessage() {
+        alert(messageArr[currentStep]);
+        currentStep++;
+        if (currentStep === messageArr.length) {
+            currentStep = 0;
+        }
+    }
  
 };

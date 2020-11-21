@@ -64,10 +64,10 @@ function setup() {
 
                 case 'test':
                     //display emoji and words in output call text sentiment
-                    displayEmojiInOutput(words);
+                    allPickedChar = displayEmojiInOutput(words);
 
                     // TODO: PROBLEM - BELOW IS NOT UPDATED ON FIRST SPEECH
-                    allPickedChar = allPickedChar.concat(currentPickedChar);
+                    //allPickedChar = allPickedChar.concat(currentPickedChar);
                         console.log('Current characters: ' + currentPickedChar);
                         console.log('All characters ever said: ' + allPickedChar);
                         console.log('All characters lenght: ' + allPickedChar.length);
@@ -83,8 +83,12 @@ function setup() {
 
                 case 'bins':
                     //display emoji in bins call emoji sentiment
-                    //displayEmojiInOutput(words);
+                    var emojiArray = getEmojiFromWords(words);
+                    animateScoredEmoji(emojiArray);
 
+                    console.log(emojiArray);
+                    console.log(words);
+                    // startBinAnimation(emojiArray);
                     break;
 
                 case 'text':
@@ -129,8 +133,96 @@ function displayEmojiInOutput(words) {
             }
             
         }, 500*(index+1));
+        if (index == words.length-1) {
+            console.log('called once');
+            allPickedChar = allPickedChar.concat(currentPickedChar);
+            console.log('INSIDE');
+            console.log(allPickedChar);
+            console.log(currentPickedChar);
+        }
     });
+
+    
+    return allPickedChar;
 }
+
+//*****************************************************************
+//goes trhough all spoken words, finds corresponding emoji and returns them in array
+//if there is no corresponding emoji it ignores the word
+function getEmojiFromWords(words) {
+    var emojiToAnimate = [];
+    words.forEach((word, index) => {
+        var node = EmojiTranslate.translateForDisplay(words[index]);
+
+        if (node.nodeName == 'SELECT') {
+            var optionsArray = node.childNodes;
+            var randomNumber = Math.floor(Math.random() * ((optionsArray.length - 1) - 0) + 0);
+            // console.log('Word: ' + word + '\n' +
+            // 'Number of options: ' + optionsArray.length + '\n' +
+            // 'Random number picked: ' + randomNumber);
+            var pickedNodeValue = optionsArray[randomNumber];
+            emojiToAnimate.push(pickedNodeValue.innerText.toString().trim());
+            //createP(pickedNodeValue.innerText.toString().trim()).parent(testContainer);
+            //testContainer.appendChild(optionsArray[randomNumber]);
+            //currentPickedChar.push(pickedNodeValue.innerText.toString().trim());
+        } else if (node.nodeName == 'SPAN') {
+            var getEmoji =  EmojiTranslate.getAllEmojiForWord(word);
+            if (getEmoji !== '') {
+                //its emoji
+                //currentPickedChar.push(node.innerText.toString().trim());
+                emojiToAnimate.push(node.innerText.toString().trim());
+            }
+            //testContainer.appendChild(node);
+        }
+    });
+
+    return emojiToAnimate;
+}
+
+
+function animateScoredEmoji(emojis) {
+    // [
+    //     {emoji: ''},
+    //     {score: '1'}
+    // ]
+    var scoredEmoji = [];
+    var emojiList = loadJSON('libraries/emojiNewWithScore.json', fileLoaded);
+    
+    function fileLoaded() {
+        console.log('Json file loaded!');
+        console.log('------- emoji sentiment ------');
+        console.log(char.toString().trim());
+
+        emojis.forEach((emoji, index) => {
+            for (let e in emojiList) {
+                if (emojiList[e].char == emoji.toString().trim()) {
+                    console.log(emojiList[e].score);
+                    score += Number(emojiList[e].score);
+                    var newEmoji = {};
+                    newEmoji["emoji"] = emojiList[e].char;
+                    newEmoji["score"] = emojiList[e].score;
+                    scoredEmoji.push(newEmoji);
+                }
+            }
+        });
+
+        console.log(scoredEmoji);
+        console.log('scoredEmoji');
+        startBinAnimation(scoredEmoji);
+
+        // positiveEmojiPercentage = Math.round((score / allPickedChar.length) * 100);
+        // negativeEmojiPercentage = 100 - positiveEmojiPercentage;
+
+        // animatePercentage(positiveEmojiPercentage, positive);
+        // animatePercentage(negativeEmojiPercentage, negative);
+
+        // console.log('Positive percentage: ' + positiveEmojiPercentage);
+        // console.log('Negative percentage: ' + negativeEmojiPercentage);
+        // emojiSentimentResult.html('emoji sentiment score: ' + score + ' comparative: ' + score / allPickedChar.length + ' ' + Math.round((score / allPickedChar.length) * 100) + '%');
+    }
+}
+
+
 
 //*****************************************************************
 //goes trhough all spoken words and prints them in the output
@@ -293,6 +385,7 @@ function animatePercentage(finalNumber, element) {
         }
     });
 }
+
 
 //*****************************************************************
 //called when <select> is changed, to toggle visibility of elements 

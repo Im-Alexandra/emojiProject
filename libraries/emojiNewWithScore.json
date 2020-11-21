@@ -4337,7 +4337,7 @@
 		"char": "🍵",
 		"fitzpatrick_scale": false,
 		"category": "food_and_drink",
-		"score": "1"
+		"score": "-1"
 	},
 	"cup_with_straw": {
 		"keywords": ["drink", "soda"],

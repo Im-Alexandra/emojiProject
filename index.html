@@ -49,9 +49,14 @@
 		
 		<!-- BINS - only emoji with our subjective sentiment analysis -->
 		<div class="output emojiBins" id="bins">
-			<div class="rightBin"><canvas id="poster"></canvas></div>
-			<div class="leftBin"><canvas id="poster"></canvas></div>
-			<div class=></div>
+			<div class="rightBin">
+				<div id="canvasNegative"></div>
+			</div>
+			<div class="leftBin">
+				<div id="canvasPositive"></div>
+			</div>
+			<canvas id="canvas" width="400" height="220"></canvas>
+
 		</div>
 
 		<!-- RATING -->
@@ -80,7 +85,7 @@
 
 </div>
 
-	<script  src="ballsScript.js"></script>
+	
 	<script src="libraries/p5.js"></script>
 	<script src="libraries/p5.dom.js"></script>
 	<script src="libraries/p5.sound.js"></script>
@@ -88,6 +93,7 @@
 	<!-- <script src="libraries/require.js" ></script> -->
 	<!-- <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
 	<script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script> -->
+	<script  src="ballsScript.js"></script>
 	<script src="sketch.js"></script>
 </body>
 </html>
