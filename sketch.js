@@ -24,18 +24,27 @@ var stopBtn = document.querySelector('#stop');
 var restartBtn = document.querySelector('#restart');
 var positive = jQuery('.positiveNumber');
 var negative = jQuery('.negativeNumber');
+var positiveText = document.querySelector('.positive');
+var negativeText = document.querySelector('.negative');
+var positiveEmoji = document.querySelector('.positive2');
+var negativeEmoji = document.querySelector('.negative2');
+var checkbox = document.querySelector('#continuosCheckbox');
+var speechEndNote = document.querySelector('#speechEndNote');
 
 function setup() {
     noCanvas();
     let lang = navigator.language || 'en-US';
     let speechRec = new p5.SpeechRec(lang, gotSpeech);
-    let continous = true;
+    let continous = false;
     let interim = false;
 
-    startBtn.addEventListener('click', startListening);
-    stopBtn.addEventListener('click', stopListening);
-    restartBtn.addEventListener('click', scoreTheList);
+    checkbox.addEventListener('click', function (e){
+        continous = e.target.checked;
+    });
 
+    startBtn.addEventListener('click', startListening);
+    restartBtn.addEventListener('click', restart);
+    
     newModel = ml5.neuralNetwork();
     sentiment = ml5.sentiment('movieReviews', modelReady);
 
@@ -46,10 +55,30 @@ function setup() {
 
     function startListening() {
         speechRec.start(continous, interim);
+        speechEndNote.classList.add('hide');
     }
 
-    function stopListening() {
-        speechRec.stop();
+    speechRec.onEnd = showEnd;
+    function showEnd() {
+        speechEndNote.classList.remove('hide');
+    }
+
+    function restart() {
+        if (state == "text") {
+            allWords = [];
+            const textParent = document.getElementById("text")
+            while (textParent.firstChild) {
+                textParent.firstChild.remove()
+            }
+        } else if (state == "bins") {
+            balls = [];
+            allPickedChar = [];
+        }
+        
+         //rating bar
+         animatePercentage(50, positive);
+         animatePercentage(50, negative);
+         negativePercent.style.left = 50+'%';
     }
     
     function gotSpeech() {
@@ -64,40 +93,18 @@ function setup() {
 
                 case 'test':
                     //display emoji and words in output call text sentiment
-                    allPickedChar = displayEmojiInOutput(words);
-
-                    // TODO: PROBLEM - BELOW IS NOT UPDATED ON FIRST SPEECH
-                    //allPickedChar = allPickedChar.concat(currentPickedChar);
-                        console.log('Current characters: ' + currentPickedChar);
-                        console.log('All characters ever said: ' + allPickedChar);
-                        console.log('All characters lenght: ' + allPickedChar.length);
-    
-                    allWords.push(words);
-                    analyseSentiment(words);
-
-                    for ( let i in currentPickedChar ) {
-                        analyseEmojiSentiment(currentPickedChar[i]);
-                    }     
-                    currentPickedChar = [];
+                    displayEmojiInOutput(words);
                     break;
 
                 case 'bins':
                     //display emoji in bins call emoji sentiment
                     var emojiArray = getEmojiFromWords(words);
                     animateScoredEmoji(emojiArray);
-
-                    console.log(emojiArray);
-                    console.log(words);
-                    // startBinAnimation(emojiArray);
                     break;
 
                 case 'text':
                     //display words
                     displayTextInOutput(words);
-                    allWords.push(words);
-
-                    //animate rating according to academic sentiment
-                    analyseSentiment(words);
             }
         }
     }
@@ -108,42 +115,46 @@ function setup() {
 //if there is no corresponding emoji it parents the text
 function displayEmojiInOutput(words) {
     console.log('Words: ' + words);
-    var counter = words.length;
+    currentPickedChar = [];
 
     words.forEach((word, index) => {
-        setTimeout(function(){
-            var node = EmojiTranslate.translateForDisplay(words[index]);
-            if (node.nodeName == 'SELECT') {
-                var optionsArray = node.childNodes;
-                var randomNumber = Math.floor(Math.random() * ((optionsArray.length - 1) - 0) + 0);
-                // console.log('Word: ' + word + '\n' +
-                // 'Number of options: ' + optionsArray.length + '\n' +
-                // 'Random number picked: ' + randomNumber);
-                var pickedNodeValue = optionsArray[randomNumber];
-                createP(pickedNodeValue.innerText.toString().trim()).parent(testContainer);
-                //testContainer.appendChild(optionsArray[randomNumber]);
-                currentPickedChar.push(pickedNodeValue.innerText.toString().trim());
-            } else if (node.nodeName == 'SPAN') {
-                var getEmoji =  EmojiTranslate.getAllEmojiForWord(word);
-                if (getEmoji !== '') {
-                    //its emoji
-                    currentPickedChar.push(node.innerText.toString().trim());
-                }
-                testContainer.appendChild(node);
+        var getEmoji =  EmojiTranslate.getAllEmojiForWord(word);
+
+        if (getEmoji !== '') {
+            if (getEmoji.length > 1) {
+                //MULTIPLE EMOJI OPTIONS
+                var randomNumber = Math.floor(Math.random() * ((getEmoji.length - 1) - 0) + 0);
+                currentPickedChar.push(getEmoji[randomNumber]);
+                //createP(getEmoji[randomNumber].toString().trim()).parent(testContainer);
+                console.log('multiple options for this word: ' + word );
+                console.log('we are picking: ' + getEmoji[randomNumber]);
+            } else {
+                //ONLY 1 EMOJI OPTION
+                currentPickedChar.push(getEmoji[0]);
+                //createP(getEmoji[0].toString().trim()).parent(testContainer);
+                console.log('only 1 option for this word: ' + word );
+                console.log(getEmoji[0]);
             }
-            
-        }, 500*(index+1));
-        if (index == words.length-1) {
-            console.log('called once');
-            allPickedChar = allPickedChar.concat(currentPickedChar);
-            console.log('INSIDE');
-            console.log(allPickedChar);
-            console.log(currentPickedChar);
+        } else {
+            //NO EMOJI FOR THIS WORD
+            console.log('This word: ' + word + ' has no emoji');
+            //createP(word.toString().trim()).parent(testContainer);
         }
     });
 
+    console.log('currentPickedChar: ');
+    console.log(currentPickedChar);
+    console.log(currentPickedChar[0]);
     
-    return allPickedChar;
+    console.log(allPickedChar);
+
+    currentPickedChar.forEach((char, index) => {
+        setTimeout(function(){
+            createP(char.toString().trim()).parent(testContainer);
+        }, 500*(index+1));
+    });
+
+    animateScoredEmoji(currentPickedChar);
 }
 
 //*****************************************************************
@@ -157,77 +168,82 @@ function getEmojiFromWords(words) {
         if (node.nodeName == 'SELECT') {
             var optionsArray = node.childNodes;
             var randomNumber = Math.floor(Math.random() * ((optionsArray.length - 1) - 0) + 0);
-            // console.log('Word: ' + word + '\n' +
-            // 'Number of options: ' + optionsArray.length + '\n' +
-            // 'Random number picked: ' + randomNumber);
             var pickedNodeValue = optionsArray[randomNumber];
             emojiToAnimate.push(pickedNodeValue.innerText.toString().trim());
-            //createP(pickedNodeValue.innerText.toString().trim()).parent(testContainer);
-            //testContainer.appendChild(optionsArray[randomNumber]);
-            //currentPickedChar.push(pickedNodeValue.innerText.toString().trim());
         } else if (node.nodeName == 'SPAN') {
             var getEmoji =  EmojiTranslate.getAllEmojiForWord(word);
             if (getEmoji !== '') {
                 //its emoji
-                //currentPickedChar.push(node.innerText.toString().trim());
                 emojiToAnimate.push(node.innerText.toString().trim());
             }
-            //testContainer.appendChild(node);
         }
     });
 
     return emojiToAnimate;
 }
 
-
+//*****************************************************************
+//receives array of emoji -> turns it into an array of scored emoji and displays them
+//in correspondig bins + calculates score
 function animateScoredEmoji(emojis) {
-    // [
-    //     {emoji: ''},
-    //     {score: '1'}
-    // ]
     var scoredEmoji = [];
     var emojiList = loadJSON('libraries/emojiNewWithScore.json', fileLoaded);
     
     function fileLoaded() {
-        console.log('Json file loaded!');
         console.log('------- emoji sentiment ------');
-        console.log(char.toString().trim());
 
         emojis.forEach((emoji, index) => {
             for (let e in emojiList) {
                 if (emojiList[e].char == emoji.toString().trim()) {
-                    console.log(emojiList[e].score);
-                    score += Number(emojiList[e].score);
+                    if (Math.sign(emojiList[e].score) === 1) {
+                        score += Number(emojiList[e].score);
+                    }
                     var newEmoji = {};
                     newEmoji["emoji"] = emojiList[e].char;
                     newEmoji["score"] = emojiList[e].score;
                     scoredEmoji.push(newEmoji);
+                    allPickedChar.push(emojiList[e].char);
                 }
             }
         });
 
-        console.log(scoredEmoji);
-        console.log('scoredEmoji');
         startBinAnimation(scoredEmoji);
+        
+        if (Math.sign(score) === 1) {
+            positiveEmojiPercentage = limitNumberWithinRange (Math.round((100 / allPickedChar.length) * score), 0, 100);
+            negativeEmojiPercentage = limitNumberWithinRange (Math.round((100 / allPickedChar.length) * (allPickedChar.length - score)), 0, 100);
+        } else if (Math.sign(score) === -1) {
+            negativeEmojiPercentage = limitNumberWithinRange (Math.round((100 / allPickedChar.length) * score), 0, 100);
+            positiveEmojiPercentage = limitNumberWithinRange (Math.round((100 / allPickedChar.length) * (allPickedChar.length - score)), 0, 100);
+        } else if (Math.sign(score) === 0) {
+            negativeEmojiPercentage = 50;
+            positiveEmojiPercentage = 50;
+        }
 
-        // positiveEmojiPercentage = Math.round((score / allPickedChar.length) * 100);
-        // negativeEmojiPercentage = 100 - positiveEmojiPercentage;
+        console.log("Score: " + score);
+        console.log(allPickedChar);
 
-        // animatePercentage(positiveEmojiPercentage, positive);
-        // animatePercentage(negativeEmojiPercentage, negative);
+        animatePercentage(positiveEmojiPercentage, positive);
+        animatePercentage(negativeEmojiPercentage, negative);
+        negativePercent.style.left = positiveEmojiPercentage+'%';
 
-        // console.log('Positive percentage: ' + positiveEmojiPercentage);
-        // console.log('Negative percentage: ' + negativeEmojiPercentage);
-        // emojiSentimentResult.html('emoji sentiment score: ' + score + ' comparative: ' + score / allPickedChar.length + ' ' + Math.round((score / allPickedChar.length) * 100) + '%');
+        console.log('Positive percentage: ' + positiveEmojiPercentage);
+        console.log('Negative percentage: ' + negativeEmojiPercentage);
+        emojiSentimentResult.html('emoji sentiment score: ' + score + ' allPickedChar lenghth: ' + allPickedChar.length + ' comparative: ' + score / allPickedChar.length + ' ' + Math.round((score / allPickedChar.length) * 100) + '%');
     }
 }
 
+function limitNumberWithinRange (num, min, max) {
+    const MIN = min || 0;
+    const MAX = max || 100;
+    const parsed = parseInt(num);
+    return Math.min(Math.max(parsed, MIN), MAX);
+}
 
 
 //*****************************************************************
 //goes trhough all spoken words and prints them in the output
 function displayTextInOutput(words) {
-    console.log('Spoken words: ' + words);
     var counter = words.length;
 
     words.forEach((word, index) => {
@@ -235,6 +251,7 @@ function displayTextInOutput(words) {
             if (counter == words.length) {
                 word = word.charAt(0).toUpperCase() + word.slice(1); ;
             }
+            allWords.push(word);
 
             var addWord = createP(word).parent(textContainer);
             counter --;
@@ -242,6 +259,8 @@ function displayTextInOutput(words) {
             if (counter == 0) {
                 addWord.addClass('lastWord');
                 var dot = createP('.').parent(textContainer);
+                //call analyse sentiment when all words are added to allWords array
+                analyseSentiment(allWords);
             }
         }, 500*(index+1));
     });
@@ -249,8 +268,7 @@ function displayTextInOutput(words) {
 
 function analyseSentiment(text){
     console.log('Do academic sentiment analysis for: ');
-    console.log(text);
-    console.log('All words said: ' + allWords);
+    console.log(text.join(' '));
 
     // make the prediction
     var prediction = sentiment.predict(text.join(' '));
@@ -286,6 +304,9 @@ function analyseEmojiSentiment(char) {
         positiveEmojiPercentage = Math.round((score / allPickedChar.length) * 100);
         negativeEmojiPercentage = 100 - positiveEmojiPercentage;
 
+        console.log('HELLLOOOOOO');
+        console.log(negativePercent);
+        negativePercent.style.left = positiveEmojiPercentage+'%';
         animatePercentage(positiveEmojiPercentage, positive);
         animatePercentage(negativeEmojiPercentage, negative);
 
@@ -366,22 +387,21 @@ function modelReady() {
     modelReadyB = true;
     if (state != 'intro') {
         startBtn.disabled = false;
-        stopBtn.disabled = false;
+        //stopBtn.disabled = false;
         restartBtn.disabled = false;
     };
 }
 
+//*****************************************************************
+//to animate the percentage numbers change 
 function animatePercentage(finalNumber, element) {
     var $this = element;
+    //console.log(finalNumber, element);
     jQuery({ Counter: $this.text()}).animate({ Counter: finalNumber }, {
         duration: 4000,
         easing: 'swing',
         step: function () {
-        if (finalNumber > 50) {
-            $this.text(Math.ceil(this.Counter));
-        } else if (finalNumber <= 50) {
-            $this.text(Math.floor(this.Counter));
-        }
+            $this.text(Math.round(this.Counter));
         }
     });
 }
@@ -401,7 +421,6 @@ function toggle(value) {
             ratingContainer.classList.remove('active');
             binsContainer.classList.remove('active');
             startBtn.disabled = true;
-            stopBtn.disabled = true;
             restartBtn.disabled = true;
             controlsContainer.classList.remove('active');
             break;
@@ -415,7 +434,6 @@ function toggle(value) {
             controlsContainer.classList.add('active');
             if (modelReadyB) {
                 startBtn.disabled = false;
-                stopBtn.disabled = false;
                 restartBtn.disabled = false;
             };
             break;
@@ -427,9 +445,25 @@ function toggle(value) {
             ratingContainer.classList.add('active');
             binsContainer.classList.add('active');
             controlsContainer.classList.add('active');
+
+            positiveText.classList.add('hide');
+            negativeText.classList.add('hide');
+            positiveEmoji.classList.remove('hide');
+            negativeEmoji.classList.remove('hide');
+
+            //fix rating when toggling
+            if (score) {
+                animatePercentage(positiveEmojiPercentage, positive);
+                animatePercentage(negativeEmojiPercentage, negative);
+                negativePercent.style.left = positiveEmojiPercentage+'%';
+            } else {
+                animatePercentage(50, positive);
+                animatePercentage(50, negative);
+                negativePercent.style.left = 50+'%';
+            }
+
             if (modelReadyB) {
                 startBtn.disabled = false;
-                stopBtn.disabled = false;
                 restartBtn.disabled = false;
             };
             break;
@@ -441,9 +475,23 @@ function toggle(value) {
             ratingContainer.classList.add('active');
             binsContainer.classList.remove('active');
             controlsContainer.classList.add('active');
+
+            positiveText.classList.remove('hide');
+            negativeText.classList.remove('hide');
+            positiveEmoji.classList.add('hide');
+            negativeEmoji.classList.add('hide');
+
+            //fix rating when toggling
+            if (allWords.length != 0) {
+                analyseSentiment(allWords);
+            } else {
+                animatePercentage(50, positive);
+                animatePercentage(50, negative);
+                negativePercent.style.left = 50+'%';
+            }
+            
             if (modelReadyB) {
                 startBtn.disabled = false;
-                stopBtn.disabled = false;
                 restartBtn.disabled = false;
             };
             break;

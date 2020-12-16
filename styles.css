@@ -77,7 +77,7 @@ select, select:active, select:focus, select:hover {
   display: flex;
   width: 100%;
   border-top: 3px solid white;
-  padding:20px 0 20px 0;
+  padding:25px 0 25px 0;
 }
 
 .header img {
@@ -90,6 +90,8 @@ select, select:active, select:focus, select:hover {
   padding: 5px;
   background-color: transparent !important;
   border: 3px solid white !important;
+  margin-right: 2.5px;
+  margin-left: 2.5px;
 }
 
 .header button:disabled {
@@ -300,18 +302,18 @@ select, select:active, select:focus, select:hover {
   margin-block-end:0.2em;
 }
 
-.barContainer .positive {
-  float: right;
+.barContainer .positive, .barContainer .positive2 {
+  float: left;
   font-size:26px;
-  margin-right: 20px;
+  margin-left: 20px;
   margin-block-start:0.2em;
   margin-block-end:0.2em;
 }
 
-.barContainer .negative {
-  float: left;
+.barContainer .negative, .barContainer .negative2 {
+  float: right;
   font-size:26px;
-  margin-left: 20px;
+  margin-right: 20px;
   margin-block-start:0.2em;
   margin-block-end:0.2em;
 }
@@ -363,4 +365,77 @@ canvas {
 
 .hide {
   display: none !important;
+}
+
+.switch {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  display: inline-block;
+  width: 28px;
+  height: 15px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 11px;
+  width: 11px;
+  left: 3px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #075f4e;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #075f4e;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(11px);
+  -ms-transform: translateX(11px);
+  transform: translateX(11px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 15px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+#speechEndNote {
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  transform: translateX(-50%);
+}
+
+button:disabled > img {
+  opacity: 0.4;
 }

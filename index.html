@@ -7,6 +7,7 @@
 
 	<title>myproject</title>
 	<link href="styles.css" rel="stylesheet">
+	<link rel="shortcut icon" href="img/favicon-32x32.png" />
 	<script src="libraries/bundle.js"></script>
 	<script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
@@ -29,8 +30,8 @@
 		<select name="cars" id="cars" onchange="toggle(this.value)">
 			<option value="intro" selected="selected">Intro</option>
 			<option value="test">Test</option>
-			<option value="bins">Bins</option>
-			<option value="text">Text</option>
+			<option value="bins">Emoji analysis</option>
+			<option value="text">Text analysis</option>
 		</select>
 
 		<!-- INTRO -->
@@ -66,19 +67,25 @@
 			<div class="bar">
 				<div class="negativePercent"></div>
 			</div>
-			<p class="negative">POSITIVE</p>
-			<p class="negative">😃</p>
-			<p class="positive">NEGATIVE</p>
-			<p class="positive">💩</p>
+			<p class="positive">POSITIVE</p>
+			<p class="positive2">😃</p>
+			<p class="negative">NEGATIVE</p>
+			<p class="negative2">💩</p>
 		</div>
 
 		<!-- CONTROLS -->
 		<div class="header" id="controls">
+			<label class="switch">
+				<input type="checkbox" id="continuosCheckbox">
+				<span class="slider round"></span>
+				<span>Listen continuosly</span>
+			</label>
 			<div class="navAlign">
 				<button id="start" disabled="true"><img src="img/start.png"></button>
-				<button id="stop" disabled="true"><img src="img/pause.png"></button>
+				<!--<button id="stop" disabled="true"><img src="img/pause.png"></button>!-->
 				<button id="restart" disabled="true"><img src="img/restart.png"></button>
 			</div>
+			<span id="speechEndNote">Press play to speak</span>
 		</div>
 
 	</div>

@@ -1,8 +1,7 @@
 let NUM_BALLS = 10,
     DAMPING = 0.7,
     GRAVITY = 0.3,
-    SPEED = 0.3;
-    LETTERS = ['A', 'L', 'E', 'X', 'A', 'N', 'D', 'R', 'A'];
+    SPEED = 0.5;
 
 let canvas, ctx, TWO_PI = Math.PI * 2, balls = [], mouse = {down:false,x:0,y:0};
 
@@ -34,7 +33,8 @@ let Ball = function(x, y, radius, content, score) {
 Ball.prototype.apply_force = function(delta) {
 
     delta *= delta;
-    this.fy += GRAVITY + Math.random() + 0.2;
+    //this.fy += GRAVITY + Math.random() + 0.2;
+    this.fy += GRAVITY;
     this.x += this.fx * delta;
     this.y += this.fy * delta;
     this.fx = this.fy = 0;
@@ -66,32 +66,6 @@ Ball.prototype.draw = function(ctx,color) {
     ctx.textBaseline = 'middle';
     ctx.fillText(this.content, this.x, this.y);
 };
-
-// let LeftBin = function() {
-//     this.width = canvas.width / 2;
-//     this.height = canvas.height;
-//     this.x = 0;
-//     this.y = 0;
-// };
-
-// let RightBin = function() {
-//     this.width = canvas.width / 2;
-//     this.height = canvas.height;
-//     this.x = canvas.width / 2;
-//     this.y = 0;
-// };
-
-// LeftBin.prototype.draw = function(){
-//     stroke(255, 204, 100);
-//     strokeWeight(4);
-//     rect(this.x, this.y, this.width, this.height);
-// }
-
-// RightBin.prototype.draw = function(){
-//     stroke(255, 204, 0);
-//     strokeWeight(4);
-//     rect(this.x, this.y, this.width, this.height);
-// }
 
 var resolve_collisions = function(ip) {
 
@@ -238,7 +212,6 @@ var update = function() {
 
 
 var add_ball = function(x, y, r, content, score) {
-    console.log('add ball called: ' + this.content);
     if (score == '1'){
         var x = x || Math.random() * (355 - 30) + 30;
     } else if (score == '-1') {
@@ -246,14 +219,15 @@ var add_ball = function(x, y, r, content, score) {
     }
     
     //0-335, 460-800
-    y = y || Math.random() * (canvas.height - 60) - canvas.height,
+    //y = y || Math.random() * (canvas.height - 60) - canvas.height,
+    y = y || -20,
     // r = r || 10 + Math.random() * 25,
     r = 20,
     s = true,
     i = balls.length;
 
     if (s) balls.push(new Ball(x, y, r, content, score));
-    console.log(balls);
+    //console.log(balls);
 };
 
 // window.addEventListener('resize', resizeCanvas, false);
@@ -273,7 +247,7 @@ function startBinAnimation(emojiArray) {
 
     canvas.width = 800;
     canvas.height = 440;
-    console.log(emojiArray);
+    //console.log(emojiArray);
 
     if (emojiArray != '') {
         emojiArray.forEach((emoji, index) => {
@@ -302,7 +276,7 @@ function startBinAnimation(emojiArray) {
         };
         balls.forEach(ball => {
             if (isIntersect(pos, ball)) {
-                console.log('click on circle: ' + ball.id);
+                //console.log('click on circle: ' + ball.id);
                 if (ball.id === 1) {
                     alert('RED BALL')
                 } else {
