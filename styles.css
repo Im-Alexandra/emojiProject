@@ -10,6 +10,7 @@ body {
 body h1 {
   font-weight: 100 !important;
   margin-left:10%;
+  margin-right:10%;
   font-size:20px;
 }
 
@@ -228,6 +229,7 @@ select, select:active, select:focus, select:hover {
 
 #intro p {
   margin-left: 10%;
+  margin-right: 10%;
 }
 
 /* styles for the test scrollbar  */
